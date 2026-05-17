@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Cosme Slot Machine</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="gameScreen" class="screen">
+      <div class="slot-machine" id="slotTouchArea">
+        <div class="brand-header machine-brand-header">
+          <div id="brandTitle" class="brand-title">BRAND NAME</div>
+          <button id="langSwitchBtn" class="lang-switch">JA</button>
+        </div>
+        <div class="slot-frame">
+          <div class="reel" data-reel="0">💄</div>
+          <div class="reel" data-reel="1">🌸</div>
+          <div class="reel" data-reel="2">✨</div>
+        </div>
+        <div id="playHint" class="play-hint"></div>
+        <button id="startBtn" class="primary-btn"></button>
+        <button id="soldOutBanner" class="soldout-banner hidden"></button>
+        <div class="machine-lower" aria-hidden="true">
+          <div class="machine-lower-top"></div>
+          <div class="machine-lower-window">
+            <div class="machine-lower-logo">GIVENCHY BEAUTY</div>
+            <img id="showcaseWideImg" class="showcase-wide-img" alt="showcase products" />
+          </div>
+          <div class="machine-lower-foot"></div>
+        </div>
+        <div class="machine-lever" aria-hidden="true">
+          <div class="machine-lever-stick"></div>
+          <div class="machine-lever-knob"></div>
+        </div>
+      </div>
+      <div id="inlineResultLayer" class="inline-result-layer hidden">
+        <div class="result-box inline-result-box">
+          <canvas id="inlineConfettiCanvas"></canvas>
+          <div id="inlineFlashLayer" class="flash"></div>
+          <div id="inlineResultRank" class="result-rank">Result</div>
+          <div id="inlineResultImage" class="result-image">✨</div>
+          <button id="inlineResultCloseBtn" class="secondary-btn"></button>
+        </div>
+      </div>
+      <div class="footer-note" id="footerNote"></div>
+      <button id="openAdminBtn" class="small-admin-btn"></button>
+    </section>
+
+    <section id="adminScreen" class="screen hidden">
+      <div class="brand-header">
+        <div class="brand-title" id="adminTitle">Admin</div>
+      </div>
+      <div id="adminLock" class="pin-gate">
+        <h3 id="pinTitle"></h3>
+        <input id="pinInput" class="pin-input" type="password" maxlength="4" inputmode="numeric" />
+        <div class="inline-actions">
+          <button id="pinUnlockBtn" class="secondary-btn"></button>
+          <button id="pinBackBtn" class="ghost-btn"></button>
+        </div>
+      </div>
+      <div id="adminContent" class="admin-content hidden">
+        <div class="panel">
+          <h3 id="summaryTitle"></h3>
+          <div class="grid-two">
+            <div class="stat-item"><span id="labelTotalPlay"></span><strong id="totalPlayValue">0</strong></div>
+            <div class="stat-item"><span id="labelTotalWin"></span><strong id="totalWinValue">0</strong></div>
+            <div class="stat-item"><span id="labelTotalLose"></span><strong id="totalLoseValue">0</strong></div>
+            <div class="stat-item"><span id="labelStockLeft"></span><strong id="stockLeftValue">0</strong></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3 id="rankTableTitle"></h3>
+          <table>
+            <thead>
+              <tr>
+                <th id="thRank"></th>
+                <th id="thWinCount"></th>
+                <th id="thStock"></th>
+                <th id="thProbability"></th>
+              </tr>
+            </thead>
+            <tbody id="rankTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3 id="hourlyTitle"></h3>
+          <table>
+            <thead>
+              <tr>
+                <th id="thHour"></th>
+                <th id="thHourCount"></th>
+              </tr>
+            </thead>
+            <tbody id="hourlyTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3 id="settingTitle"></h3>
+          <label class="label" id="labelThemeColor"></label>
+          <input id="themeColorInput" type="color" />
+          <label class="label" id="labelBackgroundColor"></label>
+          <input id="bgColorInput" type="color" />
+          <label class="label" id="labelAccentColor"></label>
+          <input id="accentColorInput" type="color" />
+          <label class="label" id="labelBrandName"></label>
+          <input id="brandNameInput" type="text" />
+          <label class="label" id="labelReelSymbols"></label>
+          <textarea id="reelSymbolsInput"></textarea>
+          <div id="prizeEditorWrap"></div>
+          <div class="inline-actions">
+            <button id="addPrizeBtn" class="add-btn"></button>
+            <button id="saveSettingBtn" class="secondary-btn"></button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3 id="dataActionTitle"></h3>
+          <div class="inline-actions">
+            <button id="downloadCsvBtn" class="secondary-btn"></button>
+            <button id="resetDataBtn" class="danger-btn"></button>
+          </div>
+          <div class="inline-actions">
+            <button id="closeAdminBtn" class="ghost-btn"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="./scripts/config.js"></script>
+  <script src="./scripts/i18n/ja.js"></script>
+  <script src="./scripts/i18n/en.js"></script>
+  <script src="./scripts/i18n/zh.js"></script>
+  <script src="./scripts/i18n/ko.js"></script>
+  <script src="./scripts/app.js"></script>
+</body>
+</html>
