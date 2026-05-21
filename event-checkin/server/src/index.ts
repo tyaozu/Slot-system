@@ -1,0 +1,108 @@
+import path from "path";
+import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
+import session from "express-session";
+import rateLimit from "express-rate-limit";
+import authRouter from "./routes/auth";
+import searchRouter from "./routes/search";
+import checkinRouter from "./routes/checkin";
+
+dotenv.config();
+
+const app = express();
+const port = Number(process.env.PORT ?? 3001);
+const isProd = process.env.NODE_ENV === "production";
+
+const allowedOrigin = process.env.CORS_ORIGIN;
+const appBasePath = normalizeBasePath(process.env.APP_BASE_PATH);
+
+function normalizeBasePath(value: string | undefined): string {
+  const raw = (value ?? "").trim();
+  if (!raw || raw === "/") {
+    return "";
+  }
+  return `/${raw.replace(/^\/+/, "").replace(/\/+$/, "")}`;
+}
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin) {
+        return callback(null, true);
+      }
+      if (!isProd) {
+        return callback(null, true);
+      }
+      if (allowedOrigin && origin === allowedOrigin) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true
+  })
+);
+
+app.use(express.json());
+app.use(
+  rateLimit({
+    windowMs: 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false
+  })
+);
+
+app.use(
+  session({
+    name: "checkin.sid",
+    secret: process.env.SESSION_SECRET || "insecure-dev-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: isProd
+    }
+  })
+);
+
+function requireAuth(req: express.Request, res: express.Response, next: express.NextFunction) {
+  if (!req.session.loggedIn) {
+    return res.status(401).json({ error: "unauthorized" });
+  }
+  return next();
+}
+
+const apiRouter = express.Router();
+apiRouter.use("/auth", authRouter);
+apiRouter.use("/search", requireAuth, searchRouter);
+apiRouter.use("/checkin", requireAuth, checkinRouter);
+
+app.use("/api", apiRouter);
+if (appBasePath) {
+  app.use(`${appBasePath}/api`, apiRouter);
+}
+
+const clientDistPath = path.resolve(__dirname, "../../client/dist");
+if (appBasePath) {
+  app.use(appBasePath, express.static(clientDistPath));
+  app.get(`${appBasePath}/*`, (req, res, next) => {
+    if (req.path.startsWith(`${appBasePath}/api`)) {
+      return next();
+    }
+    return res.sendFile(path.join(clientDistPath, "index.html"));
+  });
+} else {
+  app.use(express.static(clientDistPath));
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api")) {
+      return next();
+    }
+    return res.sendFile(path.join(clientDistPath, "index.html"));
+  });
+}
+
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});

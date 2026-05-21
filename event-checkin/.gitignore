@@ -1,0 +1,13 @@
+node_modules
+dist
+*.log
+
+client/node_modules
+client/dist
+client/*.tsbuildinfo
+client/vite.config.js
+server/node_modules
+server/dist
+
+server/.env
+server/credentials.json

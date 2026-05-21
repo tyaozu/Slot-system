@@ -1,0 +1,12 @@
+DirectoryIndex index.html
+
+RewriteEngine On
+RewriteBase /event-checkin/
+
+RewriteRule ^index\.html$ - [L]
+
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+RewriteRule ^ index.html [L]
