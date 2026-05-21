@@ -11,3 +11,6 @@ server/dist
 
 server/.env
 server/credentials.json
+
+.DS_Store
+cookie.txt
