@@ -17,6 +17,8 @@ const isProd = process.env.NODE_ENV === "production";
 
 const allowedOrigin = process.env.CORS_ORIGIN;
 const appBasePath = normalizeBasePath(process.env.APP_BASE_PATH);
+const sessionCookieSameSite = normalizeSameSite(process.env.SESSION_COOKIE_SAMESITE);
+const sessionCookieSecure = normalizeBoolean(process.env.SESSION_COOKIE_SECURE, isProd);
 
 function normalizeBasePath(value: string | undefined): string {
   const raw = (value ?? "").trim();
@@ -24,6 +26,40 @@ function normalizeBasePath(value: string | undefined): string {
     return "";
   }
   return `/${raw.replace(/^\/+/, "").replace(/\/+$/, "")}`;
+}
+
+function normalizeBoolean(value: string | undefined, fallback: boolean): boolean {
+  if (!value) {
+    return fallback;
+  }
+  const normalized = value.trim().toLowerCase();
+  if (["1", "true", "yes", "on"].includes(normalized)) {
+    return true;
+  }
+  if (["0", "false", "no", "off"].includes(normalized)) {
+    return false;
+  }
+  return fallback;
+}
+
+function normalizeSameSite(
+  value: string | undefined
+): "strict" | "lax" | "none" | boolean {
+  const normalized = (value ?? "").trim().toLowerCase();
+  if (normalized === "lax") {
+    return "lax";
+  }
+  if (normalized === "none") {
+    return "none";
+  }
+  if (normalized === "false") {
+    return false;
+  }
+  return "strict";
+}
+
+if (isProd) {
+  app.set("trust proxy", 1);
 }
 
 app.use(
@@ -62,8 +98,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      sameSite: "strict",
-      secure: isProd
+      sameSite: sessionCookieSameSite,
+      secure: sessionCookieSecure
     }
   })
 );
