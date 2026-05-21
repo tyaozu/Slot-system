@@ -1,4 +1,5 @@
 import path from "path";
+import fs from "fs";
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
@@ -85,22 +86,28 @@ if (appBasePath) {
 }
 
 const clientDistPath = path.resolve(__dirname, "../../client/dist");
-if (appBasePath) {
-  app.use(appBasePath, express.static(clientDistPath));
-  app.get(`${appBasePath}/*`, (req, res, next) => {
-    if (req.path.startsWith(`${appBasePath}/api`)) {
-      return next();
-    }
-    return res.sendFile(path.join(clientDistPath, "index.html"));
-  });
+const clientIndexPath = path.join(clientDistPath, "index.html");
+
+if (fs.existsSync(clientIndexPath)) {
+  if (appBasePath) {
+    app.use(appBasePath, express.static(clientDistPath));
+    app.get(`${appBasePath}/*`, (req, res, next) => {
+      if (req.path.startsWith(`${appBasePath}/api`)) {
+        return next();
+      }
+      return res.sendFile(clientIndexPath);
+    });
+  } else {
+    app.use(express.static(clientDistPath));
+    app.get("*", (req, res, next) => {
+      if (req.path.startsWith("/api")) {
+        return next();
+      }
+      return res.sendFile(clientIndexPath);
+    });
+  }
 } else {
-  app.use(express.static(clientDistPath));
-  app.get("*", (req, res, next) => {
-    if (req.path.startsWith("/api")) {
-      return next();
-    }
-    return res.sendFile(path.join(clientDistPath, "index.html"));
-  });
+  console.log("client/dist not found. Running in API-only mode.");
 }
 
 app.listen(port, () => {
